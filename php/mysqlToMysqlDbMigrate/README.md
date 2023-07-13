@@ -16,6 +16,4 @@ In your query files, things you may do as below:-
 
 * In order for multiple db to work, remember to put **{YOUR_DB_NAME}** in front of your table for every query. For example, INSERT INTO TABLE_A SELECT * FROM {YOUR_DB_NAME}.TABLE_A;
 
-* With transaction will not work , if there's a CREATE/ALTER/DROP/TRUNCATE command in your queries. For more info : [click here...][1]
-
-[1]: https://dev.mysql.com/doc/refman/8.0/en/cannot-roll-back.html#:~:text=Some%20statements%20cannot%20be%20rolled,alter%20tables%20or%20stored%20routines.
+* With transaction will not work , if there's a CREATE/ALTER/DROP/TRUNCATE command in your queries. For more info : <a href="https://dev.mysql.com/doc/refman/8.0/en/cannot-roll-back.html#:~:text=Some%20statements%20cannot%20be%20rolled,alter%20tables%20or%20stored%20routines." target="_blank">__Click here...__</a>
