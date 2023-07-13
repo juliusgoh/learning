@@ -3,10 +3,10 @@ This script used for migration from old/other mysql db into new mysqldb. It is t
 
 # How to use
 Varible definition:-
-* withTransaction (true/false): Will run the queries using transaction , if encounter any error , everything will be rollback. meaning non of the query will be inserted. This is to ensure that we only want a fully success migration.
-* dryrun (true/false): In order for this to work, withTransaction must be true. Dryrun meaning, even if all the queries succeed but it will still not insert into the db.
-* echo (true/false): To echo in CLI 
-* logErrors (true/false): To log down all the queries ran, the execution time, the errors.
+* **withTransaction** (true/false): Will run the queries using transaction , if encounter any error , everything will be rollback. meaning non of the query will be inserted. This is to ensure that we only want a fully success migration.
+* **dryrun** (true/false): In order for this to work, withTransaction must be true. Dryrun meaning, even if all the queries succeed but it will still not insert into the db.
+* **echo** (true/false): To echo in CLI 
+* **logErrors** (true/false): To log down all the queries ran, the execution time, the errors.
 
 # Thing to take note
 In your query files, things you may do as below:-
