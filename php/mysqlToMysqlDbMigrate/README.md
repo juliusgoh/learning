@@ -12,9 +12,9 @@ Varible definition:-
 In your query files, things you may do as below:-
 * If you have multiple old db, sometimes you may only want to run the query once, something like inserting a hardcoded thing. You can achieving that by added !!! infront of the query.
 
-* ** YOU MUST PUT ; at the end of every query **
+* **YOU MUST PUT ; at the end of every query**
 
-* In order for multiple db to work, remember to put ** {YOUR_DB_NAME} ** in front of your table for every query. For example, INSERT INTO TABLE_A SELECT * FROM {YOUR_DB_NAME}.TABLE_A;
+* In order for multiple db to work, remember to put **{YOUR_DB_NAME}** in front of your table for every query. For example, INSERT INTO TABLE_A SELECT * FROM {YOUR_DB_NAME}.TABLE_A;
 
 * With transaction will not work , if there's a CREATE/ALTER/DROP/TRUNCATE command in your queries. For more info : [click here...][1]
 
