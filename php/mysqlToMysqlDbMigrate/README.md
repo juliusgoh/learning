@@ -13,10 +13,10 @@ Varible definition:-
 # Thing to take note
 ```
 In your query files, things you may do as below:-
-``* If you have multiple old db, sometimes you may only want to run the query once, something like inserting a hardcoded thing. You can achieving that by added !!! infront of the query.
-``* ** YOU MUST PUT ; at the end of every query **
-``* In order for multiple db to work, remember to put ** {YOUR_DB_NAME} ** in front of your table for every query. For example, INSERT INTO TABLE_A SELECT * FROM {YOUR_DB_NAME}.TABLE_A;
-``* With transaction will not work , if there's a CREATE/ALTER/DROP/TRUNCATE command in your queries. For more info : [click here...][1]
+- If you have multiple old db, sometimes you may only want to run the query once, something like inserting a hardcoded thing. You can achieving that by added !!! infront of the query.
+- ** YOU MUST PUT ; at the end of every query **
+- In order for multiple db to work, remember to put ** {YOUR_DB_NAME} ** in front of your table for every query. For example, INSERT INTO TABLE_A SELECT * FROM {YOUR_DB_NAME}.TABLE_A;
+- With transaction will not work , if there's a CREATE/ALTER/DROP/TRUNCATE command in your queries. For more info : [here link](https://dev.mysql.com/doc/refman/8.0/en/cannot-roll-back.html#:~:text=Some%20statements%20cannot%20be%20rolled,alter%20tables%20or%20stored%20routines.)
 ```
 
 [1]: https://dev.mysql.com/doc/refman/8.0/en/cannot-roll-back.html#:~:text=Some%20statements%20cannot%20be%20rolled,alter%20tables%20or%20stored%20routines.
