@@ -1,0 +1,31 @@
+*********************************************** RUNNING script ./scripts/script.sql ***********************************************
+RUNNING QUERY 1 for [HIGHBROW_HB01].[dbo]: 
+INSERT INTO test.temporaryTable SELECT '45054','HB01100004'
+
+Affected rows: 1 (0.00035881996154785 sec)
+
+RUNNING QUERY 1 for [HIGHBROW_HB02].[dbo]: 
+INSERT INTO test.temporaryTable SELECT '44986','HB01100005'
+
+Affected rows: 1 (0.00032615661621094 sec)
+
+RUNNING QUERY 1 for [HIGHBROW_HB03].[dbo]: 
+INSERT INTO test.temporaryTable SELECT '44997','HB01100003'
+
+Affected rows: 1 (0.00028300285339355 sec)
+
+RUNNING QUERY 2 for [HIGHBROW_HB01].[dbo]: 
+INSERT INTO test.temporaryTable SELECT '45082','HB01100003'
+
+Affected rows: 1 (0.0005340576171875 sec)
+
+RUNNING QUERY 2 for [HIGHBROW_HB02].[dbo]: 
+INSERT INTO test.temporaryTable SELECT '45085','HB01100002'
+
+Affected rows: 1 (0.00032901763916016 sec)
+
+RUNNING QUERY 2 for [HIGHBROW_HB03].[dbo]: 
+INSERT INTO test.temporaryTable SELECT '45157','HB01100004'
+
+Affected rows: 1 (0.00035214424133301 sec)
+
