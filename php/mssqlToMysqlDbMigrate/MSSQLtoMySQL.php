@@ -74,73 +74,96 @@ function runScript($script)
     echoAndLog("*********************************************** RUNNING script $script ***********************************************\n");
     $file = file_get_contents($script);
     $sqls = explode(";", trim($file));
-    
     array_pop($sqls);
     $i = 1;
+
     foreach ($sqls as $sql)
     {
         $runOnce = false;
-        if(substr($sql, 0 , 3) == "!!!")
+        $insertIngore = false;
+        if (strpos($sql, '!!!', 0) !== false)
         {
             $runOnce = true;
         }
-        
+
+        if (strpos($sql, '[IGNORE]', 0) !== false)
+        {
+            $insertIngore = true;
+        }
+
         $open = strpos($sql, "(");
         $close = strpos($sql, ")");
         $dbTable = str_replace("{YOUR_DB_NAME}", $newDbName, substr($sql, $open + 1, $close - $open - 1));
         $query = substr($sql, $close + 1, strlen($sql));
-        foreach($mssqlDbs AS $mssqlDbName)
+        foreach ($mssqlDbs as $mssqlDbName)
         {
-            $query = str_replace("{MSSQL_DB_NAME}",$mssqlDbName,$query);
+            $query = str_replace("{MSSQL_DB_NAME}", $mssqlDbName, $query);
             $mssqlQueryResult = $mssqlDBPDO->query($query);
             foreach ($mssqlQueryResult->fetchAll(PDO::FETCH_NUM) as $row)
             {
                 $sql = "SELECT ";
-                $hasNextData = true;
                 $j = 0;
-                while ($hasNextData)
+                $doneGenerateQuery = false;
+                $max = count($row) - 1;
+                while ($j <= $max)
                 {
-                    if (isset($row[$j]))
+                    if ($j == $max)
                     {
-                        $sql .= "'" . $row[$j] . "',";
+                        if (is_null($row[$j]))
+                        {
+                            $sql .= "NULL";
+                        }
+                        else
+                        {
+                            $sql .= "'" . rtrim($row[$j]) . "'";
+                        }
+                        $doneGenerateQuery = true;
                     }
-        
-                    if (!isset($row[$j + 1]))
+                    else
                     {
-                        $sql = rtrim($sql, ",");
-                        $hasNextData = false;
+                        if (is_null($row[$j]))
+                        {
+                            $sql .= "NULL,";
+                        }
+                        else
+                        {
+                            $sql .= "'" . rtrim($row[$j]) . "',";
+                        }
                     }
-        
                     $j++;
+
+                    if ($doneGenerateQuery)
+                    {
+                        $insertInto = $insertIngore ? "INSERT IGNORE INTO " : "INSERT INTO ";
+                        $alteredSql = "$insertInto $dbTable $sql";
+                        echoAndLog("RUNNING QUERY $i for $mssqlDbName: \n" . trim($alteredSql) . "\n");
+                        $start = microtime(true);
+                        if (!$db->query($alteredSql))
+                        {
+                            $end = microtime(true);
+                            $elapsed = $end - $start;
+                            echoAndLog("\nError description: " . $db->error . " ($elapsed sec)\n\n");
+                            if ($withTransaction)
+                            {
+                                $db->rollback();
+                            }
+
+                            exit();
+                        }
+                        else
+                        {
+                            $end = microtime(true);
+                            $elapsed = $end - $start;
+                            echoAndLog("\nAffected rows: {$db->affected_rows} ($elapsed sec)\n\n");
+                            if ($runOnce)
+                            {
+                                break;
+                            }
+                        }
+                    }
                 }
             }
-        
-            $alteredSql = "INSERT INTO $dbTable $sql";
-            echoAndLog("RUNNING QUERY $i for $mssqlDbName: \n" . trim($alteredSql)."\n");
-            $start = microtime(true);
-            if (!$db->query($alteredSql))
-            {
-                $end = microtime(true);
-                $elapsed = $end - $start;
-                echoAndLog("\nError description: " . $db->error . " ($elapsed sec)\n\n");
-                if($withTransaction)
-                {
-                    $db->rollback();
-                }
-    
-                exit();
-            }
-            else
-            {
-                $end = microtime(true);
-                $elapsed = $end - $start;
-                echoAndLog("\nAffected rows: {$db->affected_rows} ($elapsed sec)\n\n");
-                if($runOnce)
-                {
-                    break;
-                }
-            }
-        }        
+        }
         $i++;
     }
 }

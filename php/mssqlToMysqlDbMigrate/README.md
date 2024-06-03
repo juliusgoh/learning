@@ -11,6 +11,7 @@ Varible definition:-
 # Thing to take note
 In your query files, things you may do as below:-
 * If you have multiple old db, sometimes you may only want to run the query once, something like inserting a hardcoded thing. You can achieving that by added !!! infront of the query.
+* If the different db have the same data with the same id, no worries ,there's now insert ignore. You can achieve this by adding <table><tr><td>[IGNORE]</td></tr></table>infont of the query.
 * You must put the mysql table name in front of the query with brackets to indicate this data is to be inserted into that table EX: (testTable)SELECT * FROM MSSQL.table;
 
 * **YOU MUST PUT ; at the end of every query**
