@@ -1,5 +1,17 @@
 <?php
-$newDbName = "test";
+if (empty($argv[1]))
+{
+    exit();
+}
+$supportedDirectoryName = array('001smOutlet','002smUser','003smCustomer','004smInventory','005smSales','006smDiagnosis');
+$runFile = $argv[1];
+if (!in_array($runFile, $supportedDirectoryName))
+{
+    echo $runFile . " is not in supported directory name\n";
+    exit();
+}
+
+$newDbName = "local_db";
 $db = new mysqli("localhost", "root", "", $newDbName);
 $mssqlDBPDO = new PDO("sqlsrv:Server=JULIUS_ASUS;", "julius", "root");
 
@@ -10,13 +22,13 @@ $echo = true;
 $logErrors = false;
 $logFileName = "logs/".date("YmdHis")."-migrate.log";
 
-if($withTransaction)
+if ($withTransaction)
 {
     $db->begin_transaction();
 }
 
-listFolderFiles('./scripts');
-if($withTransaction)
+listFolderFiles('./'.$runFile);
+if ($withTransaction)
 {
     if ($dryrun)
     {
@@ -31,15 +43,15 @@ if($withTransaction)
 function listFolderFiles($dir)
 {
     $ffs = scandir($dir);
-    $foldersToSkip = array('.','..','logs','testFolder','007smMarketing','runSeperately');
-    foreach($foldersToSkip AS $skipFolder)
+    $foldersToSkip = array('.', '..', 'logs', 'testFolder', '007smMarketing', 'runSeperately');
+    foreach ($foldersToSkip as $skipFolder)
     {
-        if(in_array($skipFolder,$ffs))
+        if (in_array($skipFolder, $ffs))
         {
             unset($ffs[array_search($skipFolder, $ffs, true)]);
         }
     }
-    
+
     if (array_search('migrate.php', $ffs, true) !== false)
     {
         unset($ffs[array_search('migrate.php', $ffs, true)]);
@@ -79,8 +91,45 @@ function runScript($script)
 
     foreach ($sqls as $sql)
     {
+        if (substr(str_replace("\n", "", trim($sql)), 0, 2) == '--')
+        {
+            continue;
+        }
+
         $runOnce = false;
         $insertIngore = false;
+        if (strpos($sql, '|MYSQL|', 0) !== false)
+        {
+            # MYSql Insert / Update
+            $alteredSql = str_replace("|MYSQL|", "", $sql);
+            echoAndLog("RUNNING QUERY $i (MYSQL QUERY): \n" . trim($alteredSql) . "\n");
+            $start = microtime(true);
+            if (!$db->query($alteredSql))
+            {
+                $end = microtime(true);
+                $elapsed = $end - $start;
+                echoAndLog("\nError description: " . $db->error . " ($elapsed sec)\n\n");
+                if ($withTransaction)
+                {
+                    $db->rollback();
+                }
+
+                exit();
+            }
+            else
+            {
+                $end = microtime(true);
+                $elapsed = $end - $start;
+                echoAndLog("\nAffected rows: {$db->affected_rows} ($elapsed sec)\n\n");
+                if ($runOnce)
+                {
+                    break;
+                }
+            }
+            $i++;
+            continue;
+        }
+
         if (strpos($sql, '!!!', 0) !== false)
         {
             $runOnce = true;
@@ -97,8 +146,8 @@ function runScript($script)
         $query = substr($sql, $close + 1, strlen($sql));
         foreach ($mssqlDbs as $mssqlDbName)
         {
-            $query = str_replace("{MSSQL_DB_NAME}", $mssqlDbName, $query);
-            $mssqlQueryResult = $mssqlDBPDO->query($query);
+            $alteredDbQuery = str_replace("{MSSQL_DB_NAME}", $mssqlDbName, $query);
+            $mssqlQueryResult = $mssqlDBPDO->query($alteredDbQuery);
             foreach ($mssqlQueryResult->fetchAll(PDO::FETCH_NUM) as $row)
             {
                 $sql = "SELECT ";
@@ -115,7 +164,7 @@ function runScript($script)
                         }
                         else
                         {
-                            $sql .= "'" . rtrim($row[$j]) . "'";
+                            $sql .= "'" . $db->real_escape_string(rtrim($row[$j])) . "'";
                         }
                         $doneGenerateQuery = true;
                     }
@@ -127,7 +176,7 @@ function runScript($script)
                         }
                         else
                         {
-                            $sql .= "'" . rtrim($row[$j]) . "',";
+                            $sql .= "'" . $db->real_escape_string(rtrim($row[$j])) . "',";
                         }
                     }
                     $j++;
@@ -157,7 +206,7 @@ function runScript($script)
                             echoAndLog("\nAffected rows: {$db->affected_rows} ($elapsed sec)\n\n");
                             if ($runOnce)
                             {
-                                break;
+                                break 3;
                             }
                         }
                     }
