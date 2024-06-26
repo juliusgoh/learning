@@ -41,7 +41,7 @@ function scanAllDirAndResize($dir)
                         $oriBased64 = resizeImage($oriBased64, $oriWidth * $min, $oriHeight * $min, $oriWidth, $oriHeight, $type);
                     }
     
-                    file_put_contents($filePath, $oriBased64);
+                    file_put_contents("Resized_".$filePath, $oriBased64);
                 }
             }
         }
