@@ -104,6 +104,11 @@ function echoAndLog($str)
     global $echo;
     global $logErrors;
     global $logFileName;
+    
+    if (!file_exists('logs')) {
+        mkdir('logs', 0777, true);
+    }
+
     if ($echo)
     {
         echo $str;
