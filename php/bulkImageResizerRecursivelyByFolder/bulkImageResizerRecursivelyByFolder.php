@@ -5,14 +5,19 @@ $logFileName = "logs/" . date("YmdHis") . "-imageResize.log";
 
 $configHeight = 2880;
 $configWidth = 1920;
+$overwite = false;
 $dirToResizeImage = "{PATH_TO_DIRECTORY}";
 
+$start = microtime(true);
 scanAllDirAndResize($dirToResizeImage);
+$elapsed = microtime(true) - $start;
+echoAndLog("Total time elapsed: ($elapsed sec)\n");
 
 function scanAllDirAndResize($dir)
 {
     global $configHeight;
     global $configWidth;
+    global $overwrite;
 
     foreach (scandir($dir) as $filename)
     {
@@ -41,7 +46,7 @@ function scanAllDirAndResize($dir)
                         $oriBased64 = resizeImage($oriBased64, $oriWidth * $min, $oriHeight * $min, $oriWidth, $oriHeight, $type);
                     }
     
-                    file_put_contents("Resized_".$filePath, $oriBased64);
+                    file_put_contents($overwrite ? $filePath : $dir."/Resized_".$filename, $oriBased64);
                 }
             }
         }

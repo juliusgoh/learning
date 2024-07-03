@@ -7,3 +7,4 @@ Varible definition:-
 * **logErrors** (true/false): To log down all the queries ran, the execution time, the errors.
 * **configWidth** : Dimension of width to be resized to
 * **confighHeight** : Dimension of height to be resized to
+* **overwrite** (true/false): Config to overwrite resized image into the original file
