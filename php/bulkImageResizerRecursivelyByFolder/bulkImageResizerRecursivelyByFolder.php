@@ -3,21 +3,24 @@ $echo = true;
 $logErrors = true;
 $logFileName = "logs/" . date("YmdHis") . "-imageResize.log";
 
-$configHeight = 2880;
-$configWidth = 1920;
-$overwite = false;
-$dirToResizeImage = "{PATH_TO_DIRECTORY}";
+$configHeight = 2200;
+$configWidth = 1600;
+$overwrite = true;
+$dirToResizeImage = "{DIR_TO_RESIZE}";
+$megabyte = 1024 * 1024;
 
 $start = microtime(true);
 scanAllDirAndResize($dirToResizeImage);
 $elapsed = microtime(true) - $start;
 echoAndLog("Total time elapsed: ($elapsed sec)\n");
 
+
 function scanAllDirAndResize($dir)
 {
     global $configHeight;
     global $configWidth;
-    global $overwrite;
+    global $overwrite; 
+    global $megabyte;
 
     foreach (scandir($dir) as $filename)
     {
@@ -29,24 +32,26 @@ function scanAllDirAndResize($dir)
         }
         else
         {
-            if(is_file($filePath))
+            if (is_file($filePath))
             {
                 $fileType = mime_content_type($filePath);
-                if(in_array($fileType,array("image/jpeg")))
+                if (in_array($fileType, array("image/jpeg")))
                 {
-                    echoAndLog($filePath." - $fileType\n");
                     $ret = imageToBase64($filePath);
                     $encodedBased64 = $ret['dataUrl'];
                     $oriBased64 = $ret['imageData'];
-            
+                    $oriSize = round(filesize($filePath) / $megabyte, 2);
+
                     list($oriWidth, $oriHeight, $type, $attr) = getimagesize($encodedBased64);
                     if (($oriWidth * $oriHeight) > ($configWidth * $configHeight))
                     {
                         $min = min(($configWidth / $oriWidth), ($configHeight / $oriHeight));
                         $oriBased64 = resizeImage($oriBased64, $oriWidth * $min, $oriHeight * $min, $oriWidth, $oriHeight, $type);
                     }
-    
+                    $resizedSize = round(strlen($oriBased64) / $megabyte, 2);
+
                     file_put_contents($overwrite ? $filePath : $dir."/Resized_".$filename, $oriBased64);
+                    echoAndLog("$filePath - Ori Size: $oriSize MB, Resized to: $resizedSize MB\n");
                 }
             }
         }
@@ -59,7 +64,8 @@ function echoAndLog($str)
     global $logErrors;
     global $logFileName;
 
-    if (!file_exists('logs')) {
+    if (!file_exists('logs'))
+    {
         mkdir('logs', 0777, true);
     }
 
